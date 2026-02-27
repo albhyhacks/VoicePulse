@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocalPulse | Account Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&family=Anton&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: var(--color-cream);
+            margin: 0;
+            overflow-x: hidden;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ---- Unified Layout ---- */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ---- Top Nav Unification ---- */
+        .dash-topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            height: 56px;
+            background: var(--color-black);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dash-topnav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dash-logo-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--color-yellow);
+        }
+
+        .dash-logo-text {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .dash-topnav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .dash-topnav-links a {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            transition: var(--transition);
+        }
+
+        .dash-topnav-links a:hover {
+            color: white;
+        }
+
+        .dash-topnav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* ---- Sidebar Unification ---- */
+        .dash-sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--color-black);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.5rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-item.active {
+            color: var(--color-yellow);
+            border-left-color: var(--color-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .sidebar-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 1rem 1.5rem;
+        }
+
+        /* ---- Settings Content ---- */
+        .dash-main {
+            margin-left: 260px;
+            margin-top: 56px;
+            padding: 3rem;
+            max-width: 1400px;
+            box-sizing: border-box;
+        }
+
+        .settings-header {
+            margin-bottom: 3rem;
+        }
+
+        .settings-headline {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            color: var(--color-black);
+        }
+
+        .settings-subheadline {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.2rem;
+            color: #A0A0A0;
+            text-transform: uppercase;
+        }
+
+        /* Responsive Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 2.5rem;
+            margin-bottom: 8rem;
+        }
+
+        .brutal-card {
+            background: white;
+            border: 3px solid var(--color-black);
+            box-shadow: 8px 8px 0px 0px var(--color-black);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .brutal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: var(--color-yellow);
+        }
+
+        .brutal-card.danger::before {
+            background: var(--color-primary);
+        }
+
+        .brutal-card.dark {
+            background: var(--color-black);
+            color: white;
+        }
+
+        .brutal-card.dark::before {
+            background: var(--color-yellow);
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Inputs & Interactive */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .brutal-input {
+            width: 100%;
+            background: var(--color-cream);
+            border: 2px solid var(--color-black);
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .btn-brutal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            font-family: 'Anton', sans-serif;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border: 3px solid var(--color-black);
+            box-shadow: 4px 4px 0px 0px var(--color-black);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn-brutal:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px var(--color-black);
+        }
+
+        .btn-yellow {
+            background: var(--color-yellow);
+            color: #000;
+        }
+
+        .btn-white {
+            background: #FFF;
+            color: #000;
+        }
+
+        .btn-black {
+            background: #000;
+            color: #FFF;
+        }
+
+        /* Toggles */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 0;
+            border-bottom: 2px solid #EEE;
+        }
+
+        .toggle-label-main {
+            font-weight: 900;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .toggle-box {
+            width: 38px;
+            height: 38px;
+            background: var(--color-yellow);
+            border: 3px solid var(--color-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .toggle-check {
+            width: 18px;
+            height: 18px;
+            background: #000;
+        }
+
+        .toggle-box.off {
+            background: white;
+        }
+
+        .toggle-box.off .toggle-check {
+            background: transparent;
+        }
+
+        /* Floating Footer */
+        .settings-footer {
+            position: fixed;
+            bottom: 0;
+            left: 260px;
+            right: 0;
+            background: var(--color-cream);
+            border-top: 3px solid var(--color-black);
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .dash-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .dash-main {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+
+            .settings-footer {
+                left: 0;
+            }
+
+            .dash-topnav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+        <!-- Unified Top Nav -->
+        <header class="dash-topnav">
+            <div class="dash-topnav-left">
+                <svg class="dash-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                        fill="currentColor" />
+                </svg>
+                <div class="dash-logo-text">VocalPulse Dashboard</div>
+            </div>
+            <nav class="dash-topnav-links">
+                <a href="analysis.html">Voice Lab</a>
+                <a href="history.html">History</a>
+                <a href="signals.html">Signals</a>
+                <a href="settings.html" class="active">Settings</a>
+            </nav>
+            <div class="dash-topnav-right">
+                <div class="online-indicator">
+                    <span class="online-dot pulse"></span> Online
+                </div>
+                <div class="dash-user">
+                    <span class="dash-user-name">Admin Root</span>
+                    <a href="login.html" class="dash-user-logout">Logout</a>
+                </div>
+                <div class="dash-avatar">👤</div>
+            </div>
+        </header>
+
+        <!-- Unified Sidebar -->
+        <aside class="dash-sidebar">
+            <nav class="sidebar-nav">
+                <div class="sidebar-item" onclick="window.location.href='dashboard.html'">
+                    <span class="sidebar-icon">📊</span> Analysis
+                </div>
+                <div class="sidebar-item" onclick="window.location.href='history.html'">
+                    <span class="sidebar-icon">🕐</span> History Log
+                </div>
+                <div class="sidebar-item" onclick="window.location.href='signals.html'">
+                    <span class="sidebar-icon">⚙️</span> Signal Config
+                </div>
+                <div class="sidebar-item" onclick="setActive(this)">
+                    <span class="sidebar-icon">🔑</span> API Access
+                </div>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-item active" onclick="window.location.href='settings.html'">
+                    <span class="sidebar-icon">🔧</span> Settings
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dash-main">
+            <header class="settings-header">
+                <h1 class="settings-headline">// ACCOUNT PREFERENCES</h1>
+                <p class="settings-subheadline">SETTINGS TERMINAL.</p>
+            </header>
+
+            <div class="settings-grid">
+                <!-- Left Column -->
+                <div class="settings-col">
+                    <section class="brutal-card">
+                        <div class="card-content">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                                    <div
+                                        style="width: 80px; height: 80px; background: #000; color: var(--color-yellow); display: flex; align-items: center; justify-content: center; font-family: 'Anton'; font-size: 2rem; border: 3px solid #000;">
+                                        AK</div>
+                                    <div>
+                                        <h3 class="card-title" style="margin-bottom: 0;">USER PROFILE</h3>
+                                        <span
+                                            style="background: var(--color-yellow); border: 2px solid #000; padding: 2px 8px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase;">PRO
+                                            PLAN</span>
+                                    </div>
+                                </div>
+                                <button class="btn-brutal btn-white"
+                                    style="padding: 0.6rem 1.2rem; font-size: 0.8rem;">Upload Avatar</button>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="input-group">
+                                    <label class="input-label">Full Name</label>
+                                    <input type="text" class="brutal-input" value="Alex Kinsman">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Display Name</label>
+                                    <input type="text" class="brutal-input" value="ak_vocal">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Email Address</label>
+                                    <input type="email" class="brutal-input" value="alex@vocalpulse.io">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Phone</label>
+                                    <input type="text" class="brutal-input" value="+1 (555) 000-1234">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="brutal-card" style="border-top: 8px solid var(--color-primary);">
+                        <div class="card-content">
+                            <h3 class="card-title">SECURITY</h3>
+                            <div class="input-group">
+                                <label class="input-label">New Password</label>
+                                <input type="password" class="brutal-input" placeholder="••••••••••••">
+                            </div>
+                            <button class="btn-brutal btn-black" style="width: 100%;">Update Password</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right Column -->
+                <div class="settings-col">
+                    <section class="brutal-card dark">
+                        <div class="card-content">
+                            <h3 class="card-title" style="color: var(--color-yellow);">USAGE STATUS</h3>
+                            <div style="margin-bottom: 1.5rem;">
+                                <div
+                                    style="display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: 900; color: #AAA; margin-bottom: 0.5rem;">
+                                    <span>ANALYSES</span>
+                                    <span>428 / 500</span>
+                                </div>
+                                <div
+                                    style="height: 12px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);">
+                                    <div style="height: 100%; background: var(--color-yellow); width: 85%;"></div>
+                                </div>
+                            </div>
+                            <button class="btn-brutal btn-yellow" style="width: 100%; border-color: white;">Upgrade
+                                Plan</button>
+                        </div>
+                    </section>
+
+                    <section class="brutal-card">
+                        <div class="card-content">
+                            <h3 class="card-title">PREFERENCES</h3>
+                            <div class="toggle-row">
+                                <span class="toggle-label-main">Email Notifications</span>
+                                <div class="toggle-box" onclick="this.classList.toggle('off')">
+                                    <div class="toggle-check"></div>
+                                </div>
+                            </div>
+                            <div class="toggle-row" style="border: none;">
+                                <span class="toggle-label-main">Dark Mode Auto</span>
+                                <div class="toggle-box off" onclick="this.classList.toggle('off')">
+                                    <div class="toggle-check"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <!-- Unified Save Bar -->
+        <footer class="settings-footer" id="saveFooter">
+            <div style="display: flex; align-items: center; gap: 1rem; font-family: 'Anton'; font-size: 1.5rem;">
+                <span style="color: var(--color-primary);">⚠️</span> // UNSAVED CHANGES
+            </div>
+            <div style="display: flex; gap: 1.5rem;">
+                <button class="btn-brutal btn-white" onclick="hideFooter()">Discard</button>
+                <button class="btn-brutal btn-yellow" onclick="hideFooter()">Save Changes</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function hideFooter() {
+            document.getElementById('saveFooter').style.transform = 'translateY(100%)';
+        }
+    </script>
+</body>
+
+</html>

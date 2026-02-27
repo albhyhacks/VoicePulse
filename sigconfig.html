@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Biometric Signal Configuration | VocalPulse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Anton&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9d406",
+                        "background-light": "#F2EDE6",
+                        "background-dark": "#23200f",
+                        "terminal-black": "#0D0D0D",
+                        "rust": "#b45309",
+                        "cyan-accent": "#0891b2",
+                        "purple-accent": "#7c3aed",
+                        "green-accent": "#16a34a"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"],
+                        "anton": ["Anton"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .custom-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #f9d406;
+            outline: none;
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            background: #0D0D0D;
+            cursor: pointer;
+            border: 2px solid #f9d406;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-full">
+<!-- Sidebar -->
+<aside class="w-64 border-r border-primary/20 bg-white dark:bg-background-dark h-screen sticky top-0 flex flex-col p-6">
+<div class="mb-10">
+<h1 class="text-xl font-bold tracking-tighter text-terminal-black dark:text-primary">VocalPulse</h1>
+<p class="text-xs uppercase tracking-widest text-slate-500 font-mono">Biometric Terminal</p>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-primary/10 rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary text-terminal-black font-bold rounded" href="#">
+<span class="material-symbols-outlined">settings_input_component</span>
+<span class="text-sm uppercase">Signal Config</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-primary/10 rounded" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-primary/10 rounded" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Users</span>
+</a>
+<div class="mt-auto">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 hover:bg-primary/10 rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">System Settings</span>
+</a>
+</div>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 pb-32">
+<!-- Navbar -->
+<header class="flex items-center justify-between border-b border-primary/20 px-10 py-4 bg-white/50 backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl">stat_2</span>
+<h2 class="text-lg font-bold uppercase tracking-tight">VocalPulse Terminal</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 border-none rounded focus:ring-2 ring-primary w-64 text-sm" placeholder="Search parameters..." type="text"/>
+</div>
+<div class="flex gap-4">
+<button class="p-2 bg-slate-100 rounded hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold leading-none">ADMIN_01</p>
+<p class="text-[10px] text-slate-500 font-mono">ROOT_LEVEL</p>
+</div>
+<img class="size-10 rounded-full border border-primary" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_Is0wx2bjZHM62CXZkpVz6i-bpbr_gb8FvLDt4dBvr_q4Gtp5P9FGOv1dZR7gxlLtGekJ-lYnAUtLCsX_epMnBQOda5vSd9Gar4kGBNs9mGn48Wrs7es22MJZo0w8EkfEUbGn9T7jIlMVh3rXDCj-VWvVtQoFFVtw_Zq0FLj0T1Wi7QhafHCPLqUE0Xlk__QgcD7oSOgDoZhQ_Z-bLiduOGj58L75lyqe6VFOxQQBtW7vqQa-At-282Q1gUHa75rPFXgCMQ-L3gO7"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-10 space-y-8">
+<!-- Page Header -->
+<div class="space-y-1">
+<h1 class="font-anton text-5xl leading-none text-terminal-black">// SIGNAL CONFIGURATION TERMINAL</h1>
+<p class="font-anton text-2xl text-slate-400 uppercase tracking-widest">SIGNAL CONFIG.</p>
+</div>
+<!-- Engine Status Bar -->
+<div class="bg-terminal-black text-white p-4 rounded-lg flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-8">
+<span class="font-mono text-primary font-bold">v1.0 ONLINE</span>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-green-accent/20 border border-green-accent rounded-full">
+<div class="size-2 rounded-full bg-green-accent animate-pulse"></div>
+<span class="text-xs font-bold uppercase tracking-wider">All Signals Active</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 rounded-full">
+<span class="text-xs font-bold uppercase tracking-wider text-primary">Latency: 87ms</span>
+</div>
+</div>
+</div>
+<button class="bg-primary text-terminal-black px-6 py-2 rounded font-bold text-sm flex items-center gap-2 hover:brightness-110 transition-all uppercase tracking-tighter">
+<span class="material-symbols-outlined text-lg">rebase_edit</span>
+                        Run Diagnostics
+                    </button>
+</div>
+<!-- Signal Cards Section -->
+<div class="space-y-6">
+<!-- Signal 01 (Expanded) -->
+<div class="bg-white border-l-[6px] border-primary shadow-sm rounded-r overflow-hidden">
+<div class="bg-terminal-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<span class="font-anton text-3xl text-primary leading-none">01</span>
+<span class="font-mono text-white text-lg font-bold tracking-tight">VOCAL_RANGE_PEAK</span>
+<span class="font-anton text-xl text-slate-500">20Hz - 20kHz</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-primary font-bold uppercase font-mono">Enabled</span>
+<button class="w-12 h-6 bg-primary rounded-full relative">
+<div class="absolute right-1 top-1 size-4 bg-terminal-black rounded-full"></div>
+</button>
+</div>
+</div>
+<div class="p-8 grid grid-cols-10 gap-8">
+<div class="col-span-6 space-y-10">
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="font-bold text-sm tracking-widest uppercase">Detection Threshold</label>
+<span class="font-anton text-2xl text-primary">82.4%</span>
+</div>
+<input class="custom-slider" type="range" value="82"/>
+<div class="flex justify-between text-[10px] font-mono text-slate-400">
+<span>MIN_LIMIT</span>
+<span>MAX_LIMIT</span>
+</div>
+</div>
+<div class="space-y-4">
+<label class="font-bold text-sm tracking-widest uppercase">Sensitivity Presets</label>
+<div class="flex gap-2">
+<button class="flex-1 py-3 border-2 border-slate-200 font-bold text-xs hover:border-primary transition-colors">LOW</button>
+<button class="flex-1 py-3 border-2 border-primary bg-primary/10 font-black text-xs">MEDIUM</button>
+<button class="flex-1 py-3 border-2 border-slate-200 font-bold text-xs hover:border-primary transition-colors">HIGH</button>
+</div>
+</div>
+</div>
+<div class="col-span-4">
+<div class="bg-terminal-black rounded p-6 h-full space-y-6">
+<div class="flex items-center justify-between">
+<h4 class="text-white text-xs font-bold font-mono tracking-widest uppercase">Live Health</h4>
+<span class="material-symbols-outlined text-primary">query_stats</span>
+</div>
+<div class="space-y-6">
+<div class="h-16 flex items-end gap-1">
+<!-- Simple Chart Mockup -->
+<div class="bg-primary/20 w-full h-1/2"></div>
+<div class="bg-primary/40 w-full h-2/3"></div>
+<div class="bg-primary w-full h-full"></div>
+<div class="bg-primary/60 w-full h-3/4"></div>
+<div class="bg-primary/30 w-full h-1/3"></div>
+<div class="bg-primary/80 w-full h-5/6"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="border-l border-primary/30 pl-3">
+<p class="text-[10px] text-slate-500 uppercase font-mono">Detection Rate</p>
+<p class="text-xl font-anton text-white">99.2%</p>
+</div>
+<div class="border-l border-primary/30 pl-3">
+<p class="text-[10px] text-slate-500 uppercase font-mono">Accuracy</p>
+<p class="text-xl font-anton text-white">0.04ms</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-slate-50 px-8 py-3 flex items-center justify-between border-t border-slate-100">
+<span class="text-[10px] text-slate-400 font-mono italic">LAST_MODIFIED: 2023-11-24 14:02:11 UTC</span>
+<button class="bg-primary text-terminal-black text-xs font-black px-6 py-2 rounded hover:brightness-105 transition-all">SAVE SIGNAL 01</button>
+</div>
+</div>
+<!-- Signal 02 (Collapsed) -->
+<div class="bg-white border-l-[6px] border-green-accent shadow-sm rounded-r overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="bg-terminal-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<span class="font-anton text-3xl text-green-accent leading-none">02</span>
+<span class="font-mono text-white text-lg font-bold tracking-tight">PULSE_CADENCE</span>
+<span class="font-anton text-xl text-slate-500">60bpm - 180bpm</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-green-accent font-bold uppercase font-mono">Active</span>
+<button class="material-symbols-outlined text-white">expand_more</button>
+</div>
+</div>
+</div>
+<!-- Signal 03 (Collapsed) -->
+<div class="bg-white border-l-[6px] border-cyan-accent shadow-sm rounded-r overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="bg-terminal-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<span class="font-anton text-3xl text-cyan-accent leading-none">03</span>
+<span class="font-mono text-white text-lg font-bold tracking-tight">THERMAL_SIGNATURE</span>
+<span class="font-anton text-xl text-slate-500">35.5°C - 39.0°C</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-cyan-accent font-bold uppercase font-mono">Active</span>
+<button class="material-symbols-outlined text-white">expand_more</button>
+</div>
+</div>
+</div>
+<!-- Signal 04 (Collapsed) -->
+<div class="bg-white border-l-[6px] border-rust shadow-sm rounded-r overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="bg-terminal-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<span class="font-anton text-3xl text-rust leading-none">04</span>
+<span class="font-mono text-white text-lg font-bold tracking-tight">STRESS_OSCILLATION</span>
+<span class="font-anton text-xl text-slate-500">0.1Hz - 5.0Hz</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-rust font-bold uppercase font-mono">Active</span>
+<button class="material-symbols-outlined text-white">expand_more</button>
+</div>
+</div>
+</div>
+<!-- Signal 05 (Collapsed) -->
+<div class="bg-white border-l-[6px] border-purple-accent shadow-sm rounded-r overflow-hidden opacity-80 hover:opacity-100 transition-opacity">
+<div class="bg-terminal-black p-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<span class="font-anton text-3xl text-purple-accent leading-none">05</span>
+<span class="font-mono text-white text-lg font-bold tracking-tight">VELOCITY_VECTOR</span>
+<span class="font-anton text-xl text-slate-500">DYNAMIC_MAP</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] text-purple-accent font-bold uppercase font-mono">Active</span>
+<button class="material-symbols-outlined text-white">expand_more</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Bar -->
+<footer class="fixed bottom-0 right-0 left-64 bg-background-light border-t-[3px] border-terminal-black p-6 flex items-center justify-between shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-50">
+<div class="flex items-center gap-4">
+<div class="size-4 bg-primary animate-pulse rounded-full"></div>
+<p class="font-anton text-2xl tracking-tight text-terminal-black">// UNSAVED CHANGES DETECTED IN SIGNAL_01</p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-4 bg-slate-200 text-slate-600 font-black rounded hover:bg-slate-300 transition-all uppercase tracking-tight">
+                    Discard All
+                </button>
+<button class="px-12 py-4 bg-terminal-black text-primary font-black rounded hover:brightness-125 transition-all shadow-lg flex items-center gap-3 uppercase tracking-tight">
+<span class="material-symbols-outlined">save</span>
+                    Save All Signals
+                </button>
+</div>
+</footer>
+</div>
+</body></html>

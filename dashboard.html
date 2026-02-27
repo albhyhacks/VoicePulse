@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VocalPulse — Admin Dashboard</title>
+    <meta name="description"
+        content="VocalPulse admin control panel for voice fraud analysis and signal health monitoring." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body {
+            background: var(--color-cream);
+            margin: 0;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ---- Dashboard Layout ---- */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ---- Top Nav ---- */
+        .dash-topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            height: 56px;
+            background: var(--color-black);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dash-topnav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dash-logo-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--color-yellow);
+        }
+
+        .dash-logo-text {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .dash-logo-sub {
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dash-topnav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .dash-topnav-links a {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            transition: var(--transition);
+        }
+
+        .dash-topnav-links a:hover {
+            color: white;
+        }
+
+        .dash-topnav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .online-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #4ade80;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .dash-user {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .dash-user-name {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 0.05em;
+        }
+
+        .dash-user-logout {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dash-user-logout:hover {
+            color: var(--color-primary);
+        }
+
+        .dash-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        /* ---- Sidebar ---- */
+        .dash-sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--color-black);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.5rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-item.active {
+            color: var(--color-yellow);
+            border-left-color: var(--color-yellow);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        .sidebar-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 1rem 1.5rem;
+        }
+
+        .sidebar-live {
+            margin: 0 1rem 1rem;
+            background: rgba(250, 204, 21, 0.08);
+            border: 1px solid rgba(250, 204, 21, 0.15);
+            border-radius: 4px;
+            padding: 1.2rem;
+        }
+
+        .sidebar-live-label {
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--color-yellow);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .sidebar-live-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.3rem;
+        }
+
+        .sidebar-live-num {
+            font-family: var(--font-mono-display);
+            font-size: 2.5rem;
+            color: var(--color-yellow);
+            line-height: 1;
+        }
+
+        /* ---- Main Content ---- */
+        .dash-main {
+            margin-left: 260px;
+            margin-top: 56px;
+            padding: 2rem;
+            min-height: calc(100vh - 56px);
+        }
+
+        /* ---- Stat Cards ---- */
+        .stat-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid rgba(0, 0, 0, 0.07);
+            padding: 2rem;
+            border-radius: 4px;
+        }
+
+        .stat-card-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.4);
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-card-value {
+            font-family: var(--font-mono-display);
+            font-size: 2.8rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-value.yellow {
+            color: var(--color-yellow);
+        }
+
+        .stat-card-value.red {
+            color: var(--color-primary);
+        }
+
+        .stat-card-value.black {
+            color: var(--color-black);
+        }
+
+        .stat-card-meta {
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .stat-card-meta.positive {
+            color: #16a34a;
+        }
+
+        .stat-card-meta.neutral {
+            color: rgba(0, 0, 0, 0.45);
+        }
+
+        .stat-card-meta.warning {
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ---- Two-col grid ---- */
+        .dash-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.5rem;
+        }
+
+        /* ---- Table Card ---- */
+        .card {
+            background: white;
+            border: 2px solid rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 1.8rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        }
+
+        .card-title {
+            font-family: var(--font-mono-display);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-link {
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            color: rgba(0, 0, 0, 0.5);
+            transition: var(--transition);
+        }
+
+        .card-link:hover {
+            color: var(--color-black);
+        }
+
+        /* ---- Table ---- */
+        .dash-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dash-table thead tr {
+            background: var(--color-black);
+        }
+
+        .dash-table th {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.55);
+            text-align: left;
+        }
+
+        .dash-table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dash-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dash-table tr:hover td {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .dash-table td.id-col {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .dash-table td.time-col {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        .dash-table td.source-col a {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.6);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .dash-table td.source-col a:hover {
+            color: var(--color-black);
+        }
+
+        .dash-table td.conf-col {
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+
+        .conf-high {
+            color: #16a34a;
+        }
+
+        .conf-mid {
+            color: #ca8a04;
+        }
+
+        /* ---- Signal Health ---- */
+        .signal-health-card {
+            background: white;
+            border: 2px solid rgba(0, 0, 0, 0.07);
+            border-radius: 4px;
+        }
+
+        .signal-health-list {
+            padding: 0.5rem 1.5rem 1.5rem;
+        }
+
+        .health-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .health-item:last-child {
+            border-bottom: none;
+        }
+
+        .health-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+        }
+
+        .health-item-label {
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.45);
+        }
+
+        .health-item-value {
+            font-family: var(--font-mono-display);
+            font-size: 1.5rem;
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+
+        .health-item-value.good {
+            color: var(--color-black);
+        }
+
+        .health-item-value.degraded {
+            color: var(--color-primary);
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.07);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .bar-good {
+            background: #4ade80;
+        }
+
+        .bar-degraded {
+            background: var(--color-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .dash-content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-sidebar {
+                display: none;
+            }
+
+            .dash-main {
+                margin-left: 0;
+            }
+
+            .stat-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .dash-topnav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======== TOP NAV ======== -->
+    <header class="dash-topnav">
+        <div class="dash-topnav-left">
+            <svg class="dash-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                    fill="currentColor" />
+            </svg>
+            <div class="dash-logo-text">VocalPulse Dashboard</div>
+        </div>
+        <nav class="dash-topnav-links">
+            <a href="analysis.html">Voice Lab</a>
+            <a href="history.html">History</a>
+            <a href="signals.html">Signals</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <div class="dash-topnav-right">
+            <div class="online-indicator">
+                <span class="online-dot pulse"></span> Online
+            </div>
+            <div class="dash-user">
+                <span class="dash-user-name">Admin Root</span>
+                <a href="login.html" class="dash-user-logout">Logout</a>
+            </div>
+            <div class="dash-avatar">👤</div>
+        </div>
+    </header>
+
+    <!-- ======== SIDEBAR ======== -->
+    <aside class="dash-sidebar">
+        <nav class="sidebar-nav">
+            <div class="sidebar-item active" onclick="setActive(this)">
+                <span class="sidebar-icon">📊</span>
+                Analysis
+            </div>
+            <div class="sidebar-item" onclick="window.location.href='history.html'">
+                <span class="sidebar-icon">🕐</span>
+                History Log
+            </div>
+            <div class="sidebar-item" onclick="window.location.href='signals.html'">
+                <span class="sidebar-icon">⚙️</span>
+                Signal Config
+            </div>
+            <div class="sidebar-item" onclick="setActive(this)">
+                <span class="sidebar-icon">🔑</span>
+                API Access
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item" onclick="window.location.href='settings.html'">
+                <span class="sidebar-icon">🔧</span>
+                Settings
+            </div>
+        </nav>
+        <div class="sidebar-live">
+            <div class="sidebar-live-label">
+                <span class="online-dot" style="width:6px;height:6px;"></span>
+                Live Metrics
+            </div>
+            <div class="sidebar-live-title">Today's Analyses</div>
+            <div class="sidebar-live-num" id="liveCount">1,284</div>
+        </div>
+    </aside>
+
+    <!-- ======== MAIN CONTENT ======== -->
+    <main class="dash-main">
+
+        <!-- Stat Cards -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <p class="stat-card-label">Total Analyses</p>
+                <div class="stat-card-value black" id="totalStat">42,891</div>
+                <div class="stat-card-meta positive">↑ +12% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <p class="stat-card-label">Human Verified</p>
+                <div class="stat-card-value yellow" id="humanStat">38,204</div>
+                <div class="stat-card-meta neutral">89.1% Total accuracy</div>
+            </div>
+            <div class="stat-card">
+                <p class="stat-card-label">Synthetic Flagged</p>
+                <div class="stat-card-value red" id="synthStat">4,687</div>
+                <div class="stat-card-meta warning">⚠ Anomalies detected</div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="dash-content-grid">
+
+            <!-- Recent Analyses Table -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Recent Analyses</span>
+                    <a href="#" class="card-link">View All Log</a>
+                </div>
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Conf</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysisTable">
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Signal Health -->
+            <div class="signal-health-card">
+                <div class="card-header">
+                    <span class="card-title">Signal Health</span>
+                    <span style="font-size:1rem;cursor:pointer;" title="Signal health information">ℹ️</span>
+                </div>
+                <div class="signal-health-list" id="signalHealthList">
+                    <!-- JS Populated -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Sidebar active state
+        function setActive(el) {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        // Table data
+        const analyses = [
+            { id: '#8821', time: '10:42:01', source: 'API_NORTH', status: 'human', conf: 98 },
+            { id: '#8820', time: '10:38:15', source: 'WEB_PORTAL', status: 'synthetic', conf: 92 },
+            { id: '#8819', time: '10:35:44', source: 'API_NORTH', status: 'human', conf: 96 },
+            { id: '#8818', time: '10:30:02', source: 'IOS_APP', status: 'synthetic', conf: 89 },
+            { id: '#8817', time: '10:28:12', source: 'API_SOUTH', status: 'human', conf: 99 },
+        ];
+
+        const tbody = document.getElementById('analysisTable');
+        analyses.forEach(a => {
+            const confClass = a.conf >= 95 ? 'conf-high' : 'conf-mid';
+            const badgeClass = a.status === 'human' ? 'badge-human' : 'badge-synthetic';
+            tbody.innerHTML += `
+      <tr>
+        <td class="id-col">${a.id}</td>
+        <td class="time-col">${a.time}</td>
+        <td class="source-col"><a href="analysis.html">${a.source}</a></td>
+        <td><span class="status-badge ${badgeClass}">${a.status.toUpperCase()}</span></td>
+        <td class="conf-col ${confClass}">${a.conf}%</td>
+      </tr>
+    `;
+        });
+
+        // Signal Health Data
+        const signals = [
+            { label: 'Spectral Clarity', value: 99, status: 'active' },
+            { label: 'Temporal Jitter', value: 94, status: 'active' },
+            { label: 'Frequency Shift', value: 61, status: 'degraded' },
+            { label: 'Harmonic Profile', value: 88, status: 'active' },
+            { label: 'Noise Floor', value: 91, status: 'active' },
+        ];
+
+        const healthList = document.getElementById('signalHealthList');
+        signals.forEach(s => {
+            const isDegraded = s.status === 'degraded';
+            healthList.innerHTML += `
+      <div class="health-item">
+        <div class="health-item-top">
+          <span class="health-item-label">${s.label}</span>
+          <span class="status-badge ${isDegraded ? 'badge-degraded' : 'badge-active'}">${s.status.toUpperCase()}</span>
+        </div>
+        <div class="health-item-value ${isDegraded ? 'degraded' : 'good'}">${s.value} <span style="font-size:0.9rem;font-family:var(--font-display);">%</span></div>
+        <div class="health-bar">
+          <div class="health-bar-fill ${isDegraded ? 'bar-degraded' : 'bar-good'}" style="width:${s.value}%"></div>
+        </div>
+      </div>
+    `;
+        });
+
+        // Live counter animation
+        let base = 1284;
+        setInterval(() => {
+            if (Math.random() > 0.5) base++;
+            document.getElementById('liveCount').textContent = base.toLocaleString();
+            // Also update total
+            const total = 42891 + (base - 1284);
+            document.getElementById('totalStat').textContent = total.toLocaleString();
+        }, 3500);
+    </script>
+</body>
+
+</html>

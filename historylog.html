@@ -1,0 +1,305 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analysis History Log Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&amp;family=Anton&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9d406",
+                        "background-light": "#F2EDE6",
+                        "background-dark": "#23200f",
+                        "rust": "#BC412B",
+                        "success": "#2D6A4F",
+                        "terminal-black": "#0D0D0D"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "anton": ["Anton", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderWidth: {
+                        '3': '3px',
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .brutalist-shadow {
+            box-shadow: 4px 4px 0px 0px #0D0D0D;
+        }
+        .active-nav {
+            background-color: #f9d406;
+            border: 2px solid #0D0D0D;
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-terminal-black">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-[280px] bg-white border-r-3 border-terminal-black flex flex-col h-screen sticky top-0 overflow-y-auto">
+<div class="p-8 border-b-3 border-terminal-black">
+<h1 class="font-anton text-3xl tracking-tight">VOCALPULSE</h1>
+<p class="font-mono text-xs uppercase opacity-70">Voice Auth Terminal v2.4</p>
+</div>
+<nav class="flex-1 p-4 flex flex-col gap-2">
+<div class="flex items-center gap-3 px-4 py-3 hover:bg-primary/20 cursor-pointer transition-colors border-2 border-transparent">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-bold text-sm uppercase tracking-wider">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 active-nav cursor-pointer">
+<span class="material-symbols-outlined">history</span>
+<span class="font-bold text-sm uppercase tracking-wider">History Log</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 hover:bg-primary/20 cursor-pointer transition-colors border-2 border-transparent">
+<span class="material-symbols-outlined">mic</span>
+<span class="font-bold text-sm uppercase tracking-wider">Authentication</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 hover:bg-primary/20 cursor-pointer transition-colors border-2 border-transparent">
+<span class="material-symbols-outlined">description</span>
+<span class="font-bold text-sm uppercase tracking-wider">Reports</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 hover:bg-primary/20 cursor-pointer transition-colors border-2 border-transparent mt-auto">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-bold text-sm uppercase tracking-wider">Settings</span>
+</div>
+</nav>
+<div class="p-4 border-t-3 border-terminal-black bg-terminal-black">
+<button class="w-full bg-primary py-3 px-4 font-anton text-lg border-2 border-white hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_#fff] transition-all">
+                    NEW ANALYSIS
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-10 overflow-x-hidden">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-10">
+<div>
+<h2 class="font-anton text-[48px] leading-none mb-2 uppercase tracking-tight text-terminal-black">
+                        // Analysis History Terminal
+                    </h2>
+<p class="font-anton text-2xl uppercase text-terminal-black/50 tracking-widest">History Log.</p>
+</div>
+<button class="border-3 border-terminal-black px-8 py-3 font-anton text-xl bg-transparent hover:bg-terminal-black hover:text-white transition-all">
+                    ↓ EXPORT ALL
+                </button>
+</header>
+<!-- Summary Bar -->
+<section class="grid grid-cols-3 mb-8">
+<div class="bg-white border-3 border-terminal-black border-r-0 relative pt-1">
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+<div class="p-6">
+<p class="font-mono text-sm font-bold opacity-60 mb-1">TOTAL ANALYSES</p>
+<h3 class="font-anton text-6xl">1,247</h3>
+</div>
+</div>
+<div class="bg-white border-3 border-terminal-black border-r-0 relative pt-1">
+<div class="absolute top-0 left-0 right-0 h-1 bg-success"></div>
+<div class="p-6">
+<p class="font-mono text-sm font-bold opacity-60 mb-1">HUMAN VERIFIED</p>
+<h3 class="font-anton text-6xl text-success">1,189</h3>
+</div>
+</div>
+<div class="bg-white border-3 border-terminal-black relative pt-1">
+<div class="absolute top-0 left-0 right-0 h-1 bg-rust"></div>
+<div class="p-6">
+<p class="font-mono text-sm font-bold opacity-60 mb-1">SYNTHETIC FLAGGED</p>
+<h3 class="font-anton text-6xl text-rust">58</h3>
+</div>
+</div>
+</section>
+<!-- Filter Bar -->
+<section class="bg-white border-3 border-terminal-black p-4 mb-8 flex flex-wrap items-center gap-4">
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-terminal-black">search</span>
+<input class="w-full pl-12 pr-4 py-3 border-3 border-terminal-black font-mono focus:ring-0 focus:outline-none placeholder:text-terminal-black/30" placeholder="SEARCH SESSION ID OR USER..." type="text"/>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<select class="appearance-none border-3 border-terminal-black px-6 py-3 font-mono font-bold text-sm bg-white min-w-[140px] focus:ring-0">
+<option>VERDICT</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none border-3 border-terminal-black px-6 py-3 font-mono font-bold text-sm bg-white min-w-[160px] focus:ring-0">
+<option>DATE RANGE</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none border-3 border-terminal-black px-6 py-3 font-mono font-bold text-sm bg-white min-w-[160px] focus:ring-0">
+<option>CONFIDENCE</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">expand_more</span>
+</div>
+</div>
+<a class="text-rust font-anton uppercase text-sm underline underline-offset-4 px-2" href="#">Clear Filters</a>
+</section>
+<!-- History Table -->
+<section class="relative bg-white border-3 border-terminal-black mb-6">
+<table class="w-full text-left border-collapse">
+<thead class="bg-terminal-black text-white font-mono text-xs">
+<tr>
+<th class="p-4 border-r border-white/20"><input class="border-2 border-white bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">Session ID</th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">Date</th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">User</th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">Duration</th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">Verdict</th>
+<th class="p-4 border-r border-white/20 uppercase tracking-widest">Confidence</th>
+<th class="p-4 uppercase tracking-widest">Signals</th>
+</tr>
+</thead>
+<tbody class="font-mono text-sm">
+<tr class="border-b border-terminal-black/10 bg-white">
+<td class="p-4 border-r border-terminal-black/10"><input checked="" class="border-2 border-terminal-black bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></td>
+<td class="p-4 border-r border-terminal-black/10 font-bold">#VP-9821-X</td>
+<td class="p-4 border-r border-terminal-black/10 text-xs">2023-11-24 14:02</td>
+<td class="p-4 border-r border-terminal-black/10">John Anderson</td>
+<td class="p-4 border-r border-terminal-black/10">0:14s</td>
+<td class="p-4 border-r border-terminal-black/10">
+<span class="bg-primary border-2 border-terminal-black px-2 py-1 font-anton text-xs uppercase flex items-center w-fit gap-1">
+                                    ✓ Human
+                                </span>
+</td>
+<td class="p-4 border-r border-terminal-black/10">
+<div class="flex items-center gap-2">
+<span class="w-8">99%</span>
+<div class="flex-1 h-1.5 bg-terminal-black/10">
+<div class="h-full bg-primary" style="width: 99%"></div>
+</div>
+</div>
+</td>
+<td class="p-4 font-anton text-lg">5/5</td>
+</tr>
+<tr class="border-b border-terminal-black/10 bg-[#FAF9F6]">
+<td class="p-4 border-r border-terminal-black/10"><input checked="" class="border-2 border-terminal-black bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></td>
+<td class="p-4 border-r border-terminal-black/10 font-bold">#VP-9820-Y</td>
+<td class="p-4 border-r border-terminal-black/10 text-xs">2023-11-24 13:58</td>
+<td class="p-4 border-r border-terminal-black/10">Anonymous</td>
+<td class="p-4 border-r border-terminal-black/10">0:08s</td>
+<td class="p-4 border-r border-terminal-black/10">
+<span class="bg-rust text-white border-2 border-terminal-black px-2 py-1 font-anton text-xs uppercase flex items-center w-fit gap-1">
+                                    ✗ Synthetic
+                                </span>
+</td>
+<td class="p-4 border-r border-terminal-black/10">
+<div class="flex items-center gap-2">
+<span class="w-8">94%</span>
+<div class="flex-1 h-1.5 bg-terminal-black/10">
+<div class="h-full bg-rust" style="width: 94%"></div>
+</div>
+</div>
+</td>
+<td class="p-4 font-anton text-lg">5/5</td>
+</tr>
+<tr class="border-b border-terminal-black/10 bg-white">
+<td class="p-4 border-r border-terminal-black/10"><input checked="" class="border-2 border-terminal-black bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></td>
+<td class="p-4 border-r border-terminal-black/10 font-bold">#VP-9819-A</td>
+<td class="p-4 border-r border-terminal-black/10 text-xs">2023-11-24 13:45</td>
+<td class="p-4 border-r border-terminal-black/10">Sarah Connor</td>
+<td class="p-4 border-r border-terminal-black/10">0:21s</td>
+<td class="p-4 border-r border-terminal-black/10">
+<span class="bg-primary border-2 border-terminal-black px-2 py-1 font-anton text-xs uppercase flex items-center w-fit gap-1">
+                                    ✓ Human
+                                </span>
+</td>
+<td class="p-4 border-r border-terminal-black/10">
+<div class="flex items-center gap-2">
+<span class="w-8">97%</span>
+<div class="flex-1 h-1.5 bg-terminal-black/10">
+<div class="h-full bg-primary" style="width: 97%"></div>
+</div>
+</div>
+</td>
+<td class="p-4 font-anton text-lg">5/5</td>
+</tr>
+<tr class="border-b border-terminal-black/10 bg-[#FAF9F6]">
+<td class="p-4 border-r border-terminal-black/10"><input class="border-2 border-terminal-black bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></td>
+<td class="p-4 border-r border-terminal-black/10 font-bold">#VP-9818-B</td>
+<td class="p-4 border-r border-terminal-black/10 text-xs">2023-11-24 13:30</td>
+<td class="p-4 border-r border-terminal-black/10">James Bond</td>
+<td class="p-4 border-r border-terminal-black/10">0:05s</td>
+<td class="p-4 border-r border-terminal-black/10">
+<span class="bg-primary border-2 border-terminal-black px-2 py-1 font-anton text-xs uppercase flex items-center w-fit gap-1">
+                                    ✓ Human
+                                </span>
+</td>
+<td class="p-4 border-r border-terminal-black/10">
+<div class="flex items-center gap-2">
+<span class="w-8">88%</span>
+<div class="flex-1 h-1.5 bg-terminal-black/10">
+<div class="h-full bg-primary" style="width: 88%"></div>
+</div>
+</div>
+</td>
+<td class="p-4 font-anton text-lg">5/5</td>
+</tr>
+<tr class="border-b border-terminal-black/10 bg-white">
+<td class="p-4 border-r border-terminal-black/10"><input class="border-2 border-terminal-black bg-transparent rounded-none focus:ring-0 checked:bg-primary" type="checkbox"/></td>
+<td class="p-4 border-r border-terminal-black/10 font-bold">#VP-9817-C</td>
+<td class="p-4 border-r border-terminal-black/10 text-xs">2023-11-24 13:22</td>
+<td class="p-4 border-r border-terminal-black/10">Ethan Hunt</td>
+<td class="p-4 border-r border-terminal-black/10">0:12s</td>
+<td class="p-4 border-r border-terminal-black/10">
+<span class="bg-primary border-2 border-terminal-black px-2 py-1 font-anton text-xs uppercase flex items-center w-fit gap-1">
+                                    ✓ Human
+                                </span>
+</td>
+<td class="p-4 border-r border-terminal-black/10">
+<div class="flex items-center gap-2">
+<span class="w-8">92%</span>
+<div class="flex-1 h-1.5 bg-terminal-black/10">
+<div class="h-full bg-primary" style="width: 92%"></div>
+</div>
+</div>
+</td>
+<td class="p-4 font-anton text-lg">5/5</td>
+</tr>
+</tbody>
+</table>
+<!-- Bulk Action Bar -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-terminal-black text-white p-4 flex items-center gap-8 shadow-2xl border border-white/20 min-w-[500px]">
+<div class="font-anton text-lg tracking-wider">3 RECORDS SELECTED</div>
+<div class="flex gap-3 ml-auto">
+<button class="bg-primary text-terminal-black px-6 py-1 font-anton uppercase text-sm border border-terminal-black hover:bg-white transition-colors">EXPORT</button>
+<button class="bg-rust text-white px-6 py-1 font-anton uppercase text-sm border border-white/20 hover:bg-red-700 transition-colors">DELETE</button>
+<button class="text-white opacity-60 hover:opacity-100 p-1">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Pagination -->
+<section class="flex justify-between items-center py-4">
+<div class="font-mono text-xs uppercase font-bold opacity-70">
+                    Showing 1–15 of 1,247
+                </div>
+<div class="flex gap-2">
+<button class="border-3 border-terminal-black px-4 py-2 bg-white font-anton text-sm hover:bg-primary transition-all">← PREV</button>
+<button class="border-3 border-terminal-black w-10 h-10 bg-primary font-anton text-sm">1</button>
+<button class="border-3 border-terminal-black w-10 h-10 bg-white font-anton text-sm hover:bg-primary transition-all">2</button>
+<button class="border-3 border-terminal-black w-10 h-10 bg-white font-anton text-sm hover:bg-primary transition-all">3</button>
+<span class="px-2 self-end font-anton">...</span>
+<button class="border-3 border-terminal-black w-10 h-10 bg-white font-anton text-sm hover:bg-primary transition-all">84</button>
+<button class="border-3 border-terminal-black px-4 py-2 bg-white font-anton text-sm hover:bg-primary transition-all">NEXT →</button>
+</div>
+</section>
+</main>
+</div>
+
+```</body></html>

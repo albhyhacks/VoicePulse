@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VocalPulse — Voice Analysis Terminal</title>
+    <meta name="description"
+        content="Real-time voice fraud detection terminal. Record or upload audio for biological signal analysis." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* Internal z-index overrides for Terminal elements if needed */
+        .terminal-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3.5rem 2rem 3rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .terminal-headline {
+            font-family: var(--font-mono-display);
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: white;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        /* ---- Terminal Card ---- */
+        .terminal-card {
+            width: 100%;
+            max-width: 760px;
+            border: 3px solid white;
+            background: #000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .terminal-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .terminal-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .terminal-status {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ---- Oscilloscope ---- */
+        .oscilloscope {
+            position: relative;
+            height: 220px;
+            background: #050d1a;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .osc-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.15;
+            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+            background-size: 24px 24px;
+            pointer-events: none;
+        }
+
+        .osc-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .osc-label {
+            position: absolute;
+            bottom: 12px;
+            left: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .osc-label-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-primary);
+        }
+
+        .osc-label-text {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-primary);
+        }
+
+        .osc-freq-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            color: #22d3ee;
+            padding: 3px 8px;
+            letter-spacing: 0.1em;
+        }
+
+        /* ---- Terminal Controls ---- */
+        .terminal-controls {
+            background: #000;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-record {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 22px;
+            border: 2px solid var(--color-primary);
+            background: rgba(234, 42, 51, 0.1);
+            color: var(--color-primary);
+            font-family: var(--font-mono-display);
+            font-size: 0.9rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-record:hover,
+        .btn-record.recording {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-record-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .btn-record.recording .btn-record-dot {
+            animation: pulse 0.8s ease-in-out infinite;
+        }
+
+        .timer-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timer-num {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            color: white;
+            letter-spacing: 0.15em;
+        }
+
+        .timer-label {
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .controls-right {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .controls-divider {
+            width: 1px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 0.5rem;
+        }
+
+        /* ---- RUN DETECTION button (distinct from nav/results) ---- */
+        .btn-detect {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #facc15;
+            color: var(--color-black);
+            font-family: var(--font-mono-display);
+            font-size: 0.88rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            position: relative;
+        }
+
+        .btn-detect-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .btn-detect:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-detect:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-detect-label {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+        }
+
+        .btn-detect-label .main {
+            font-size: 0.85rem;
+            font-weight: 900;
+        }
+
+        .btn-detect-label .sub {
+            font-family: var(--font-display);
+            font-size: 0.52rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            text-transform: uppercase;
+        }
+
+        .btn-upload {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 12px 20px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            font-family: var(--font-mono-display);
+            font-size: 0.82rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-upload:hover {
+            border-color: white;
+            color: white;
+        }
+
+        /* ---- Analyze loader ---- */
+        .analyze-loader {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        .analyze-loader.show {
+            display: flex;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loader-fill {
+            height: 100%;
+            background: var(--color-yellow);
+            border-radius: 2px;
+            animation: loaderAnim 1.5s ease-in-out forwards;
+        }
+
+        @keyframes loaderAnim {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* ---- Results Section ---- */
+        .results-section {
+            display: grid;
+            grid-template-columns: 42% 58%;
+            min-height: 380px;
+        }
+
+        .results-section.hidden {
+            display: none;
+        }
+
+        /* Verdict */
+        .verdict-panel {
+            background: #000;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 3px solid var(--color-black);
+        }
+
+        .verdict-eyebrow {
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 0.8rem;
+        }
+
+        .verdict-word {
+            font-family: var(--font-mono-display);
+            font-size: 5rem;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .verdict-human {
+            color: var(--color-yellow);
+        }
+
+        .verdict-synthetic {
+            color: var(--color-primary);
+        }
+
+        .verdict-score {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .verdict-score-num {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .verdict-score-label {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .verdict-bar {
+            width: 100%;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 3px;
+        }
+
+        .verdict-bar-fill {
+            height: 100%;
+            background: var(--color-yellow);
+            position: relative;
+            overflow: hidden;
+            transition: width 1.2s ease;
+        }
+
+        .verdict-bar-fill.synthetic {
+            background: var(--color-primary);
+        }
+
+        .verdict-bar-fill::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.12) 10px, rgba(0, 0, 0,
+                        0.12) 20px);
+        }
+
+        /* Signal Breakdown */
+        .signals-panel {
+            background: var(--color-cream);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .signals-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .signals-panel-title {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+        }
+
+        .session-id {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: rgba(0, 0, 0, 0.35);
+        }
+
+        .signal-row-result {
+            display: grid;
+            grid-template-columns: 2rem 1fr auto auto;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 0.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+        }
+
+        .signal-row-result:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .signal-row-result:last-child {
+            border-bottom: none;
+        }
+
+        .sig-num {
+            font-family: var(--font-mono-display);
+            font-size: 1.4rem;
+            color: rgba(0, 0, 0, 0.15);
+            line-height: 1;
+            transition: var(--transition);
+        }
+
+        .signal-row-result:hover .sig-num {
+            color: var(--color-black);
+        }
+
+        .sig-info-name {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sig-info-sub {
+            font-size: 0.65rem;
+            color: rgba(0, 0, 0, 0.4);
+            margin-top: 1px;
+        }
+
+        .sig-value {
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Panel Actions */
+        .panel-actions {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-export {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 11px 20px;
+            background: var(--color-black);
+            color: white;
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-export:hover {
+            background: #2a2a2a;
+        }
+
+        .btn-again {
+            padding: 11px 20px;
+            background: transparent;
+            color: var(--color-black);
+            border: 2px solid var(--color-black);
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-again:hover {
+            background: var(--color-black);
+            color: white;
+        }
+
+        /* Upload input hidden */
+        #fileInput {
+            display: none;
+        }
+
+        /* ---- AI Insight Panel ---- */
+        .ai-insight-section {
+            background: var(--color-black);
+            border-top: 3px solid var(--color-yellow);
+            padding: 0;
+        }
+
+        .ai-insight-section.hidden {
+            display: none;
+        }
+
+        .ai-insight-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 3rem;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .ai-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ai-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--color-yellow);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            padding: 4px 10px;
+            border-radius: 2px;
+        }
+
+        .ai-logo-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-yellow);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .ai-title {
+            font-family: var(--font-mono-display);
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            color: white;
+            letter-spacing: 0.05em;
+        }
+
+        .ai-model-tag {
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .ai-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            padding: 1.8rem;
+        }
+
+        .ai-card-title {
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-explanation-text {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+        }
+
+        .ai-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(250, 204, 21, 0.2);
+            border-top-color: var(--color-yellow);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Structured data pills */
+        .ai-structured-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .ai-struct-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .ai-struct-key {
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .ai-struct-val {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: white;
+            text-align: right;
+            max-width: 65%;
+        }
+
+        .ai-struct-val.yellow {
+            color: var(--color-yellow);
+        }
+
+        .ai-struct-val.red {
+            color: var(--color-primary);
+        }
+
+        /* Fraud intelligence card */
+        .ai-fraud-card {
+            border-color: rgba(234, 42, 51, 0.3);
+            background: rgba(234, 42, 51, 0.06);
+        }
+
+        .ai-fraud-badge {
+            font-size: 0.58rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: var(--color-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 2px;
+        }
+
+        .ai-severity-badge {
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 2px;
+        }
+
+        .sev-low {
+            background: #16a34a;
+            color: white;
+        }
+
+        .sev-medium {
+            background: #ca8a04;
+            color: white;
+        }
+
+        .sev-high {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .sev-critical {
+            background: #7f1d1d;
+            color: var(--color-yellow);
+        }
+
+        /* Challenge card */
+        .challenge-section {
+            padding: 2rem 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .challenge-bar {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .challenge-card-display {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 1.2rem 1.8rem;
+            font-family: var(--font-mono-display);
+            font-size: 1.2rem;
+            color: white;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+        }
+
+        .challenge-card-display.loading-text {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .btn-challenge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: transparent;
+            border: 2px solid rgba(250, 204, 21, 0.4);
+            color: var(--color-yellow);
+            font-family: var(--font-mono-display);
+            font-size: 0.82rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-challenge:hover {
+            background: rgba(250, 204, 21, 0.1);
+            border-color: var(--color-yellow);
+        }
+
+        .challenge-meta {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .ai-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-insight-inner {
+                padding: 2rem 1.5rem;
+            }
+
+            .challenge-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="dash-body">
+    <!--========NAV========-->
+    <header class="dash-topnav">
+        <div class="dash-topnav-left"><svg class="dash-logo-icon" fill="none" viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                    fill="currentColor" />
+            </svg>
+            <div class="dash-logo-text">VocalPulse Dashboard</div>
+        </div>
+        <nav class="dash-topnav-links"><a href="analysis.html" class="active">Voice Lab</a><a
+                href="history.html">History</a><a href="signals.html">Signals</a><a href="settings.html">Settings</a>
+        </nav>
+        <div class="dash-topnav-right">
+            <div class="online-indicator"><span class="online-dot pulse"></span>Online </div>
+            <div class="dash-user"><span class="dash-user-name">Admin Root</span><a href="login.html"
+                    class="dash-user-logout">Logout</a></div>
+            <div class="dash-avatar">👤</div>
+        </div>
+    </header>
+    <!-- Unified Sidebar -->
+    <aside class="dash-sidebar">
+        <nav class="sidebar-nav">
+            <div class="sidebar-item" onclick="window.location.href='dashboard.html'"><span
+                    class="sidebar-icon">📊</span>Analysis </div>
+            <div class="sidebar-item" onclick="window.location.href='history.html'"><span
+                    class="sidebar-icon">🕐</span>History Log </div>
+            <div class="sidebar-item" onclick="window.location.href='signals.html'"><span
+                    class="sidebar-icon">⚙️</span>Signal Config </div>
+            <div class="sidebar-item" onclick="setActive(this)"><span class="sidebar-icon">🔑</span>API Access
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item" onclick="window.location.href='settings.html'"><span
+                    class="sidebar-icon">🔧</span>Settings </div>
+        </nav>
+    </aside>
+    <!-- Transition Wrapper to match shell padding -->
+    <main class="dash-main-legacy-wrapper" style="margin-top: 0;">
+        <!--========TERMINAL ZONE========-->
+        <section class="terminal-zone">
+            <h1 class="terminal-headline">SPEAK. WE'LL KNOW.</h1>
+
+            <div class="terminal-card">
+                <!-- Card Header -->
+                <div class="terminal-card-header">
+                    <div class="terminal-dots">
+                        <div class="terminal-dot"></div>
+                        <div class="terminal-dot"></div>
+                        <div class="terminal-dot"></div>
+                    </div><span class="terminal-title">VocalPulse Terminal v4.0.2</span><span class="terminal-status"
+                        id="termStatus">READY</span>
+                </div>
+                <!-- Oscilloscope -->
+                <div class="oscilloscope" id="oscilloscope">
+                    <div class="osc-grid"></div><canvas class="osc-canvas" id="waveCanvas"></canvas>
+                    <div class="osc-label">
+                        <div class="osc-label-dot pulse" id="oscDot"></div><span class="osc-label-text"
+                            id="oscLabel">Oscilloscope Active</span>
+                    </div><span class="osc-freq-badge" id="oscFreq">9.4 Hz</span>
+                </div>
+                <!-- Controls -->
+                <div class="terminal-controls">
+                    <div class="controls-left"><button class="btn-record" id="recordBtn" onclick="toggleRecord()"><span
+                                class="btn-record-dot"></span><span id="recordLabel">Record</span></button>
+                        <div class="timer-display"><span class="timer-num" id="timerDisplay">00:00:00</span><span
+                                class="timer-label">Time Elapsed</span></div>
+                    </div>
+                    <div class="controls-right">
+                        <div class="controls-divider"></div>
+                        <!-- RUN DETECTION: runs the biological signal analysis on
+                                                        recorded/uploaded audio --><button class="btn-detect"
+                            id="analyzeBtn" onclick="runAnalysis()"><span class="btn-detect-icon">🔬</span><span
+                                class="btn-detect-label"><span class="main">Run
+                                    Detection</span><span class="sub">Process voice
+                                    signals</span></span></button>
+                        <!-- UPLOAD: load an audio file instead of recording live -->
+                        <button class="btn-upload"
+                            onclick="document.getElementById('fileInput').click()"><span>📂</span>Upload
+                            File </button><input type="file" id="fileInput" accept="audio/*"
+                            onchange="handleUpload(this)" />
+                    </div>
+                </div>
+                <!-- Analyze loader -->
+                <div class="analyze-loader" id="analyzeLoader">
+                    <div class="loader-bar">
+                        <div class="loader-fill" id="loaderFill"></div>
+                    </div><span>Processing biological signals...</span>
+                </div>
+            </div>
+        </section>
+        <!--========AI INSIGHT PANEL (Qwen / Featherless)========-->
+        <section class="ai-insight-section hidden" id="aiInsightSection">
+            <div class="ai-insight-inner">
+                <div class="ai-header">
+                    <div class="ai-header-left">
+                        <div class="ai-logo">
+                            <div class="ai-logo-dot"></div>Qwen AI Analyst
+                        </div>
+                        <div>
+                            <div class="ai-title"> // AI INSIGHT</div>
+                            <div class="ai-model-tag">Powered by Featherless AI &mdash;
+                                Qwen 2.5-7B-Instruct</div>
+                        </div>
+                    </div><span class="ai-model-tag" id="aiLangBadge">LANGUAGE: ENGLISH</span>
+                </div>
+                <div class="ai-grid" id="aiGrid">
+                    <!-- Explanation card -->
+                    <div class="ai-card" id="aiExplainCard">
+                        <div class="ai-card-title">🧠 Natural Language Explanation</div>
+                        <div class="ai-loading" id="aiExplainLoading">
+                            <div class="ai-spinner"></div>Qwen is analyzing the biomarker
+                            results...
+                        </div>
+                        <div class="ai-explanation-text" id="aiExplainText" style="display:none"></div>
+                    </div>
+                    <!-- Structured insight card -->
+                    <div class="ai-card" id="aiStructuredCard">
+                        <div class="ai-card-title">📊 Structured Analysis</div>
+                        <div class="ai-loading" id="aiStructLoading">
+                            <div class="ai-spinner"></div>Extracting structured data...
+                        </div>
+                        <div class="ai-structured-grid" id="aiStructGrid" style="display:none"></div>
+                    </div>
+                </div>
+                <!-- Fraud intelligence card — only shown if SYNTHETIC -->
+                <div class="ai-card ai-fraud-card hidden" id="aiFraudCard" style="margin-top:1.5rem">
+                    <div class="ai-card-title">🚨 Fraud Intelligence Report <span class="ai-fraud-badge">Synthetic
+                            Detected</span></div>
+                    <div class="ai-loading" id="aiFraudLoading">
+                        <div class="ai-spinner"></div>Analyzing attack pattern...
+                    </div>
+                    <div id="aiFraudContent" style="display:none">
+                        <div class="ai-structured-grid">
+                            <div class="ai-struct-row"><span class="ai-struct-key">Attack
+                                    Type</span><span class="ai-struct-val" id="fraudAttack"></span></div>
+                            <div class="ai-struct-row"><span class="ai-struct-key">Severity</span><span
+                                    id="fraudSeverity"></span></div>
+                            <div class="ai-struct-row"><span class="ai-struct-key">Recommended
+                                    Action</span><span class="ai-struct-val" id="fraudAction"></span></div>
+                            <div class="ai-struct-row" style="border:none"><span class="ai-struct-key">Analysis</span>
+                            </div>
+                        </div>
+                        <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;line-height:1.6;margin-top:0.5rem;"
+                            id="fraudAnalysis"></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Challenge Generator -->
+            <div class="challenge-section" id="challengeSection">
+                <div class="challenge-bar">
+                    <div>
+                        <div
+                            style="font-size:0.65rem;font-weight:900;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.4rem;">
+                            🎯 Cognitive Challenge Generator</div>
+                        <div class="challenge-card-display" id="challengeDisplay">Click "Get
+                            Challenge" to generate an AI-powered authentication prompt</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:flex-end;">
+                        <div style="display:flex;gap:0.75rem;"><select id="challengeDifficulty"
+                                style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:8px 12px;border-radius:3px;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select><select id="challengeLang"
+                                style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:8px 12px;border-radius:3px;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">
+                                <option value="english">English</option>
+                                <option value="tamil">Tamil</option>
+                                <option value="malayalam">Malayalam</option>
+                                <option value="hindi">Hindi</option>
+                            </select></div><button class="btn-challenge" onclick="getChallenge()">⚡ Get Challenge
+                        </button>
+                        <div class="challenge-meta" id="challengeMeta"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="results-section hidden" id="resultsSection">
+            < !-- Verdict -->
+                <div class="verdict-panel">
+                    <p class="verdict-eyebrow">Verification Verdict</p>
+                    <div class="verdict-word verdict-human" id="verdictWord">HUMAN</div>
+                    <div class="verdict-score"><span class="verdict-score-num" id="verdictScore">97.4%</span><span
+                            class="verdict-score-label">Confidence Score</span></div>
+                    <div class="verdict-bar">
+                        <div class="verdict-bar-fill" id="verdictBar" style="width:0%"></div>
+                    </div>
+                </div>
+                < !-- Signal Breakdown -->
+                    <div class="signals-panel">
+                        <div class="signals-panel-header"><span class="signals-panel-title"> //
+                                SIGNAL ANALYSIS</span>
+                            <span class="session-id" id="sessionId">SESSION ID: —</span>
+                        </div>
+                        <div id="signalResults">
+                            < !-- JS Populated -->
+                        </div>
+                        <div class="panel-actions"><button class="btn-export" onclick="exportReport()">⬇ Export
+                                Report</button>
+                            < !-- NEW SESSION: clears results and returns to recording view -->
+                                <button class="btn-again" onclick="resetAnalysis()">🔄 New
+                                    Session</button>
+                        </div>
+                    </div>
+        </section>
+        <script> // ---- Oscilloscope Canvas ----
+            const canvas = document.getElementById('waveCanvas');
+            const ctx = canvas.getContext('2d');
+            let animFrame;
+            let isRecording = false;
+            let phase = 0;
+
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            function drawWave(active) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const W = canvas.width,
+                    H = canvas.height;
+                const mid = H / 2;
+
+                // Amplitude based on recording state
+                const amp = active ? 45 + Math.sin(Date.now() / 400) * 20 : 8;
+                const tremAmp = active ? 4 : 1;
+
+                // Main cyan wave (biological)
+                ctx.beginPath();
+                ctx.strokeStyle = '#22d3ee';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#22d3ee';
+                ctx.shadowBlur = active ? 10 : 4;
+
+                for (let x = 0; x < W; x++) {
+                    const t = (x / W) * Math.PI * 8 + phase;
+                    const tremor = Math.sin(t * 1.2) * tremAmp;
+                    const breath = Math.sin(t * 0.05) * (amp * 0.3);
+                    const y = mid + Math.sin(t) * amp + tremor + breath;
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // White dashed reference
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 4]);
+
+                for (let x = 0; x < W; x++) {
+                    const t = (x / W) * Math.PI * 8 + phase;
+                    const y = mid + Math.sin(t) * (amp * 0.4);
+                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                phase += active ? 0.06 : 0.008;
+                animFrame = requestAnimationFrame(() => drawWave(active));
+            }
+
+            drawWave(false);
+
+            // ---- Recording ----
+            let timer = 0,
+                timerInterval;
+
+            function toggleRecord() {
+                isRecording = !isRecording;
+                const btn = document.getElementById('recordBtn');
+                const label = document.getElementById('recordLabel');
+                const status = document.getElementById('termStatus');
+                const oscLabel = document.getElementById('oscLabel');
+
+                if (isRecording) {
+                    btn.classList.add('recording');
+                    label.textContent = 'Stop';
+                    status.textContent = 'RECORDING';
+                    oscLabel.textContent = 'Live Capture Active';
+                    cancelAnimationFrame(animFrame);
+                    drawWave(true);
+
+                    timerInterval = setInterval(() => {
+                        timer++;
+                        document.getElementById('timerDisplay').textContent = formatTime(timer);
+                        // Randomly update freq display
+                        const hz = (8.5 + Math.random() * 2).toFixed(1);
+                        document.getElementById('oscFreq').textContent = hz + ' Hz';
+                    }
+
+                        , 1000);
+                }
+
+                else {
+                    btn.classList.remove('recording');
+                    label.textContent = 'Record';
+                    status.textContent = 'READY';
+                    oscLabel.textContent = 'Oscilloscope Active';
+                    clearInterval(timerInterval);
+                    cancelAnimationFrame(animFrame);
+                    drawWave(false);
+                }
+            }
+
+            function formatTime(s) {
+                const h = Math.floor(s / 3600).toString().padStart(2, '0');
+                const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+                const sec = (s % 60).toString().padStart(2, '0');
+
+                return `$ {
+                h
+            }
+
+            :$ {
+                m
+            }
+
+            :$ {
+                sec
+            }
+
+            `;
+            }
+
+            // ---- Analysis ----
+            // ---- Analysis API Connection ----
+            let currentSignalData = [];
+
+            async function runAnalysis() {
+                if (isRecording) toggleRecord();
+
+                const loader = document.getElementById('analyzeLoader');
+                const results = document.getElementById('resultsSection');
+                const aiSection = document.getElementById('aiInsightSection');
+                const status = document.getElementById('termStatus');
+
+                status.textContent = 'ANALYZING (QWEN AI)...';
+                loader.classList.add('show');
+                results.classList.add('hidden');
+                aiSection.classList.add('hidden');
+
+                const fill = document.getElementById('loaderFill');
+                fill.style.animation = 'none';
+                fill.offsetHeight;
+                fill.style.animation = 'loaderAnim 1.8s ease-in-out forwards';
+
+                try {
+                    // Determine if this is a live recording or an upload
+                    const isUploaded = status.textContent.includes('FILE LOADED');
+
+                    const payload = {
+
+                        duration_sec: Math.max(3.0, timer),
+                        language: "english",
+                        // Defaulting to english for now
+                        signal_hints: {
+                            freq_hz: parseFloat(document.getElementById('oscFreq').textContent) || 9.4,
+                            has_tremor: true,
+                            has_breath: true,
+                            has_precursor: true,
+                            is_uploaded: isUploaded
+                        }
+                    }
+
+                        ;
+
+                    const response = await fetch('http://localhost:8000/api/detect', {
+
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+
+                        ,
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error('API Error');
+
+                    const data = await response.json();
+
+                    loader.classList.remove('show');
+                    status.textContent = 'COMPLETE';
+                    showResults(data);
+                    showAIResults(data);
+
+                }
+
+                catch (err) {
+                    console.error("API Error:", err);
+                    status.textContent = 'ERROR: BACKEND OFFLINE';
+                    loader.classList.remove('show');
+                }
+            }
+
+            function showResults(data) {
+                const isHuman = data.is_authentic;
+                const confidence = (data.authenticity_score * 100).toFixed(1);
+                const sessionId = 'VP-' + Math.floor(Math.random() * 900 + 100) + '-' + Math.floor(Math.random() * 90 + 10) + 'A';
+
+                document.getElementById('sessionId').textContent = 'SESSION ID: ' + sessionId;
+                document.getElementById('verdictWord').textContent = data.verdict;
+                document.getElementById('verdictWord').className = 'verdict-word ' + (isHuman ? 'verdict-human' : 'verdict-synthetic');
+                document.getElementById('verdictScore').textContent = confidence + '%';
+
+                const bar = document.getElementById('verdictBar');
+                bar.className = 'verdict-bar-fill' + (isHuman ? '' : ' synthetic');
+                bar.style.width = '0%';
+
+                setTimeout(() => {
+                    bar.style.width = confidence + '%';
+                }
+
+                    , 100);
+
+                // Format biomarkers for the UI
+                currentSignalData = [{
+                    num: '01', name: 'Vocal Micro-Tremor', sub: 'Biological frequency variance', value: data.biomarkers.tremor.hz_peak.toFixed(1) + ' Hz', status: data.biomarkers.tremor.is_human ? 'detected' : 'missing'
+                }
+
+                    ,
+                {
+                    num: '02', name: 'Breath Cycle Sync', sub: 'Diaphragmatic rhythm consistency', value: data.biomarkers.respiratory.rhythm_hz.toFixed(2) + ' Hz', status: data.biomarkers.respiratory.is_human ? 'detected' : 'missing'
+                }
+
+                    ,
+                {
+                    num: '03', name: 'Neural Precursor', sub: 'Muscle pre-activation delay', value: Math.round(data.biomarkers.precursor.delay_ms) + ' ms', status: data.biomarkers.precursor.is_live_human ? 'detected' : 'missing'
+                }
+
+                    ,
+                {
+                    num: '04', name: 'Latency Jitter', sub: 'Fundamental frequency variance', value: (data.biomarkers.jitter.value * 100).toFixed(2) + '%', status: data.biomarkers.jitter.is_human ? 'detected' : 'missing'
+                }
+
+                    ,
+                {
+                    num: '05', name: 'Amplitude Shimmer', sub: 'Biological loudness imperfection', value: (data.biomarkers.shimmer.value * 100).toFixed(2) + '%', status: data.biomarkers.shimmer.is_human ? 'detected' : 'missing'
+                }
+
+                    ,
+                ];
+
+                const container = document.getElementById('signalResults');
+                container.innerHTML = '';
+
+                currentSignalData.forEach(s => {
+                    const badgeClass = s.status === 'detected' ? 'badge-detected' : 'badge-missing';
+
+                    container.innerHTML += ` <div class="signal-row-result" > <span class="sig-num" >$ {
+                    s.num
+                }
+
+                </span> <div> <div class="sig-info-name" >$ {
+                    s.name
+                }
+
+                </div> <div class="sig-info-sub" >$ {
+                    s.sub
+                }
+
+                </div> </div> <span class="sig-value" >$ {
+                    s.value
+                }
+
+                </span> <span class="status-badge ${badgeClass}" >$ {
+                    s.status.toUpperCase()
+                }
+
+                </span> </div>`;
+                });
+
+                const results = document.getElementById('resultsSection');
+                results.classList.remove('hidden');
+            }
+
+            function showAIResults(data) {
+                const aiSection = document.getElementById('aiInsightSection');
+                aiSection.classList.remove('hidden');
+
+                // Header language badge
+                document.getElementById('aiLangBadge').textContent = 'LANGUAGE: ' + (data.ai_language || 'ENGLISH').toUpperCase();
+
+                // Explanation
+                if (data.ai_explanation) {
+                    document.getElementById('aiExplainLoading').style.display = 'none';
+                    const el = document.getElementById('aiExplainText');
+                    el.textContent = data.ai_explanation;
+                    el.style.display = 'block';
+                }
+
+                // Structured Insight
+                if (data.ai_structured) {
+                    document.getElementById('aiStructLoading').style.display = 'none';
+                    const grid = document.getElementById('aiStructGrid');
+                    const confColor = data.is_authentic ? 'yellow' : 'red';
+
+                    grid.innerHTML = ` <div class="ai-struct-row"><span class="ai-struct-key">Verdict Summary</span><span class="ai-struct-val ${confColor}">$ {
+                    data.ai_structured.verdict_summary || data.verdict
+                }
+
+                </span></div><div class="ai-struct-row"><span class="ai-struct-key">Confidence</span><span class="ai-struct-val">$ {
+                    data.ai_structured.confidence_level || 'High'
+                }
+
+                </span></div><div class="ai-struct-row" style="border:none"><span class="ai-struct-key">Key Evidence</span><span class="ai-struct-val" style="color:rgba(255,255,255,0.7);font-weight:400;text-transform:none;">$ {
+                    data.ai_structured.key_evidence || 'Biomarker analysis complete.'
+                }
+
+                </span></div>`;
+                    grid.style.display = 'flex';
+                }
+
+                // Fraud Intelligence
+                const fraudCard = document.getElementById('aiFraudCard');
+
+                if (!data.is_authentic && data.fraud_intelligence && !data.fraud_intelligence.error) {
+                    fraudCard.classList.remove('hidden');
+                    document.getElementById('aiFraudLoading').style.display = 'none';
+
+                    const fi = data.fraud_intelligence;
+                    document.getElementById('fraudAttack').textContent = fi.attack_type;
+                    document.getElementById('fraudAction').textContent = fi.recommended_action;
+                    document.getElementById('fraudAnalysis').textContent = fi.fraud_analysis;
+
+                    const sevSpan = document.getElementById('fraudSeverity');
+                    sevSpan.textContent = fi.severity;
+                    sevSpan.className = 'ai-severity-badge sev-' + (fi.severity || 'high').toLowerCase();
+
+                    document.getElementById('aiFraudContent').style.display = 'block';
+                }
+
+                else {
+                    fraudCard.classList.add('hidden');
+                }
+
+                setTimeout(() => {
+                    aiSection.scrollIntoView({
+                        behavior: 'smooth', block: 'start'
+                    });
+                }
+
+                    , 100);
+            }
+
+            async function getChallenge() {
+                const diff = document.getElementById('challengeDifficulty').value;
+                const lang = document.getElementById('challengeLang').value;
+                const display = document.getElementById('challengeDisplay');
+                const meta = document.getElementById('challengeMeta');
+
+                display.classList.add('loading-text');
+                display.textContent = "Qwen is generating a unique cognitive challenge...";
+                meta.textContent = '';
+
+                try {
+                    const response = await fetch(`http: //localhost:8000/api/challenge?difficulty=${diff}&language=${lang}`);
+                    const data = await response.json();
+
+                    display.classList.remove('loading-text');
+                    display.textContent = `"${data.challenge_text}" `;
+
+                    meta.innerHTML = ` Delay expected: <span style="color:white" >$ {
+                        data.expected_delay_ms.join('-')
+                    }
+
+                    ms</span> <br><span style="color:rgba(255,255,255,0.4);font-size:0.55rem;font-weight:400;letter-spacing:0.05em;text-transform:none;" > Effectiveness: $ {
+                        data.why_effective
+                    }
+
+                    </span> `;
+                }
+
+                catch (err) {
+                    display.classList.remove('loading-text');
+                    display.textContent = "Challenge generation failed. Check backend connection.";
+                    console.error(err);
+                }
+            }
+
+            function resetAnalysis() {
+                document.getElementById('resultsSection').classList.add('hidden');
+                document.getElementById('aiInsightSection').classList.add('hidden');
+                document.getElementById('termStatus').textContent = 'READY';
+
+                // Reset AI loaders
+                document.getElementById('aiExplainLoading').style.display = 'flex';
+                document.getElementById('aiExplainText').style.display = 'none';
+                document.getElementById('aiStructLoading').style.display = 'flex';
+                document.getElementById('aiStructGrid').style.display = 'none';
+                document.getElementById('aiFraudLoading').style.display = 'flex';
+                document.getElementById('aiFraudContent').style.display = 'none';
+
+                timer = 0;
+                document.getElementById('timerDisplay').textContent = '00:00:00';
+
+                window.scrollTo({
+                    top: 0, behavior: 'smooth'
+                });
+            }
+
+            function handleUpload(input) {
+                if (input.files.length > 0) {
+                    const file = input.files[0];
+                    document.getElementById('termStatus').textContent = 'FILE LOADED: ' + file.name;
+                    setTimeout(runAnalysis, 600);
+                }
+            }
+
+            function exportReport() {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    verdict: document.getElementById('verdictWord').textContent,
+                    confidence: document.getElementById('verdictScore').textContent,
+                    signals: currentSignalData
+                }
+
+                    ;
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], {
+                    type: 'application/json'
+                });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'vocalpulse_report_' + Date.now() + '.json';
+                a.click();
+            }
+
+        </script>
+</body>
+
+</html>

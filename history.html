@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocalPulse | History Terminal</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&family=Anton&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="dash-body">
+
+    <!-- ======== TOP NAV ======== -->
+    <header class="dash-topnav">
+        <div class="dash-topnav-left">
+            <svg class="dash-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                    fill="currentColor" />
+            </svg>
+            <div class="dash-logo-text">VocalPulse Dashboard</div>
+        </div>
+        <nav class="dash-topnav-links">
+            <a href="analysis.html">Voice Lab</a>
+            <a href="history.html" class="active">History</a>
+            <a href="signals.html">Signals</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <div class="dash-topnav-right">
+            <div class="online-indicator">
+                <span class="online-dot pulse"></span> Online
+            </div>
+            <div class="dash-user">
+                <span class="dash-user-name">Admin Root</span>
+                <a href="login.html" class="dash-user-logout">Logout</a>
+            </div>
+            <div class="dash-avatar">👤</div>
+        </div>
+    </header>
+
+    <!-- ======== SIDEBAR ======== -->
+    <aside class="dash-sidebar">
+        <nav class="sidebar-nav">
+            <div class="sidebar-item" onclick="window.location.href='dashboard.html'">
+                <span class="sidebar-icon">📊</span> Analysis
+            </div>
+            <div class="sidebar-item active">
+                <span class="sidebar-icon">🕐</span> History Log
+            </div>
+            <div class="sidebar-item" onclick="window.location.href='signals.html'">
+                <span class="sidebar-icon">⚙️</span> Signal Config
+            </div>
+            <div class="sidebar-item" onclick="setActive(this)">
+                <span class="sidebar-icon">🔑</span> API Access
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item" onclick="window.location.href='settings.html'">
+                <span class="sidebar-icon">🔧</span> Settings
+            </div>
+        </nav>
+    </aside>
+
+    <style>
+        /* ---- History Content ---- */
+        .history-header {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .history-headline {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            color: var(--color-black);
+        }
+
+        .history-subheadline {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.5rem;
+            color: #A0A0A0;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .btn-export {
+            border: 3px solid var(--color-black);
+            padding: 0.8rem 2rem;
+            font-family: 'Anton', sans-serif;
+            font-size: 1.2rem;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover {
+            background: var(--color-black);
+            color: white;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            margin-bottom: 3rem;
+            border: 3px solid var(--color-black);
+            background: var(--color-black);
+        }
+
+        .summary-card {
+            background: white;
+            padding: 2rem;
+            position: relative;
+            border-right: 3px solid var(--color-black);
+        }
+
+        .summary-card:last-child {
+            border-right: none;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+        }
+
+        .card-total::before {
+            background: var(--color-yellow);
+        }
+
+        .card-human::before {
+            background: #2D6A4F;
+        }
+
+        .card-synthetic::before {
+            background: var(--color-primary);
+        }
+
+        .summary-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            opacity: 0.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-family: 'Anton', sans-serif;
+            font-size: 4rem;
+            line-height: 1;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border: 3px solid var(--color-black);
+            padding: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border: 3px solid var(--color-black);
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .filter-select {
+            padding: 0.8rem 1.5rem;
+            border: 3px solid var(--color-black);
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Table Styles */
+        .history-table-container {
+            background: white;
+            border: 3px solid var(--color-black);
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .history-table thead {
+            background: var(--color-black);
+            color: white;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .history-table th {
+            padding: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .history-table td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid #EEE;
+            border-right: 1px solid #EEE;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid var(--color-black);
+            font-family: 'Anton', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .badge-human {
+            background: var(--color-yellow);
+        }
+
+        .badge-synthetic {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .confidence-bar-bg {
+            height: 6px;
+            background: #EEE;
+            flex: 1;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+        }
+
+        /* Bulk Action Bar */
+        .bulk-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            background: var(--color-black);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 300;
+        }
+
+        .bulk-bar.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                border-right: none;
+            }
+
+            .summary-card {
+                border-right: none;
+                border-bottom: 3px solid var(--color-black);
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+    </head>
+
+    <body>
+
+        <div class="dashboard-layout">
+            <!-- Unified Top Nav -->
+            <header class="dash-topnav">
+                <div class="dash-topnav-left">
+                    <svg class="dash-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                            fill="currentColor" />
+                    </svg>
+                    <div class="dash-logo-text">VocalPulse Dashboard</div>
+                </div>
+                <nav class="dash-topnav-links">
+                    <a href="analysis.html">Voice Lab</a>
+                    <a href="history.html">History</a>
+                    <a href="signals.html">Signals</a>
+                    <a href="settings.html">Settings</a>
+                </nav>
+                <div class="dash-topnav-right">
+                    <div class="dash-user">
+                        <span class="dash-user-name" style="color: white; font-weight: 800; font-size: 0.72rem;">Admin
+                            Root</span>
+                        <a href="login.html"
+                            style="font-size: 0.6rem; color: rgba(255, 255, 255, 0.35); text-transform: uppercase;">Logout</a>
+                    </div>
+                    <div
+                        style="width: 36px; height: 36px; border-radius: 50%; background: #2a2a2a; border: 2px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center;">
+                        👤</div>
+                </div>
+            </header>
+
+            <!-- Unified Sidebar -->
+            <aside class="dash-sidebar">
+                <nav class="sidebar-nav">
+                    <div class="sidebar-item" onclick="window.location.href='dashboard.html'">
+                        <span class="sidebar-icon">📊</span> Analysis
+                    </div>
+                    <div class="sidebar-item active" onclick="window.location.href='history.html'">
+                        <span class="sidebar-icon">🕐</span> History Log
+                    </div>
+                    <div class="sidebar-item" onclick="window.location.href='signals.html'">
+                        <span class="sidebar-icon">⚙️</span> Signal Config
+                    </div>
+                    <div class="sidebar-item" onclick="setActive(this)">
+                        <span class="sidebar-icon">🔑</span> API Access
+                    </div>
+                    <div class="sidebar-divider"></div>
+                    <div class="sidebar-item" onclick="window.location.href='settings.html'">
+                        <span class="sidebar-icon">🔧</span> Settings
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="dash-main">
+                <header class="history-header">
+                    <div>
+                        <h1 class="history-headline">// ANALYSIS HISTORY TERMINAL</h1>
+                        <p class="history-subheadline">HISTORY LOG.</p>
+                    </div>
+                    <button class="btn-export">↓ EXPORT ALL</button>
+                </header>
+
+                <!-- Summary Cards -->
+                <section class="summary-grid">
+                    <div class="summary-card card-total">
+                        <p class="summary-label">TOTAL ANALYSES</p>
+                        <h3 class="summary-value">1,247</h3>
+                    </div>
+                    <div class="summary-card card-human">
+                        <p class="summary-label">HUMAN VERIFIED</p>
+                        <h3 class="summary-value" style="color: #2D6A4F;">1,189</h3>
+                    </div>
+                    <div class="summary-card card-synthetic">
+                        <p class="summary-label">SYNTHETIC FLAGGED</p>
+                        <h3 class="summary-value" style="color: var(--color-primary);">58</h3>
+                    </div>
+                </section>
+
+                <!-- Filter Bar -->
+                <section class="filter-bar">
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="SEARCH SESSION ID OR USER...">
+                    </div>
+                    <select class="filter-select">
+                        <option>VERDICT</option>
+                        <option>Human</option>
+                        <option>Synthetic</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>DATE RANGE</option>
+                        <option>Today</option>
+                        <option>Last 7 Days</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>CONFIDENCE</option>
+                        <option>> 90%</option>
+                        <option>> 75%</option>
+                    </select>
+                </section>
+
+                <!-- History Table -->
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>SESSION ID</th>
+                                <th>DATE</th>
+                                <th>USER</th>
+                                <th>DURATION</th>
+                                <th>VERDICT</th>
+                                <th>CONFIDENCE</th>
+                                <th>SIGNALS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" class="row-check"></td>
+                                <td style="font-weight: 800;">#VP-9821-X</td>
+                                <td>2023-11-24 14:02</td>
+                                <td>John Anderson</td>
+                                <td>0:14s</td>
+                                <td><span class="badge badge-human">✓ Human</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="width: 30px;">99%</span>
+                                        <div class="confidence-bar-bg">
+                                            <div class="confidence-bar-fill"
+                                                style="width: 99%; background: var(--color-yellow);"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="font-family: 'Anton'; font-size: 1.2rem;">5/5</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-check"></td>
+                                <td style="font-weight: 800;">#VP-9820-Y</td>
+                                <td>2023-11-24 13:58</td>
+                                <td>Anonymous</td>
+                                <td>0:08s</td>
+                                <td><span class="badge badge-synthetic">✗ Synthetic</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="width: 30px;">94%</span>
+                                        <div class="confidence-bar-bg">
+                                            <div class="confidence-bar-fill"
+                                                style="width: 94%; background: var(--color-primary);"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="font-family: 'Anton'; font-size: 1.2rem;">5/5</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-check"></td>
+                                <td style="font-weight: 800;">#VP-9819-A</td>
+                                <td>2023-11-24 13:45</td>
+                                <td>Sarah Connor</td>
+                                <td>0:21s</td>
+                                <td><span class="badge badge-human">✓ Human</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="width: 30px;">97%</span>
+                                        <div class="confidence-bar-bg">
+                                            <div class="confidence-bar-fill"
+                                                style="width: 97%; background: var(--color-yellow);"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="font-family: 'Anton'; font-size: 1.2rem;">5/5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+
+            <!-- Bulk Action Bar -->
+            <div class="bulk-bar" id="bulkBar">
+                <div style="font-family: 'Anton'; font-size: 1.2rem; letter-spacing: 0.05em;">
+                    <span id="selectedCount">0</span> RECORDS SELECTED
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn-brutal btn-yellow"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">EXPORT</button>
+                    <button class="btn-brutal btn-black"
+                        style="padding: 0.5rem 1.5rem; font-size: 0.8rem; background: var(--color-primary);">DELETE</button>
+                    <button onclick="clearSelection()"
+                        style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.5rem;">×</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const bulkBar = document.getElementById('bulkBar');
+            const countSpan = document.getElementById('selectedCount');
+            const checkboxes = document.querySelectorAll('.row-check');
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const count = document.querySelectorAll('.row-check:checked').length;
+                    countSpan.textContent = count;
+                    if (count > 0) {
+                        bulkBar.classList.add('active');
+                    } else {
+                        bulkBar.classList.remove('active');
+                    }
+                });
+            });
+
+            function clearSelection() {
+                checkboxes.forEach(cb => cb.checked = false);
+                bulkBar.classList.remove('active');
+            }
+        </script>
+    </body>
+
+</html>
