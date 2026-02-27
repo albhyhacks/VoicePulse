@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VocalPulse — Biology Cannot Be Forged</title>
+  <meta name="description" content="VocalPulse detects AI-generated voice through biological signals only real humans produce. Physiological tremor, breathing rhythm, neural precursor — impossible to fake." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ---- Landing Specific ---- */
+    body { background: var(--color-cream); }
+
+    /* Hero */
+    .hero {
+      padding: 6rem 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 1.4rem;
+    }
+    .hero-heading {
+      font-family: var(--font-mono-display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      max-width: 780px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-heading span.underline-red {
+      position: relative;
+      display: inline-block;
+    }
+    .hero-heading span.underline-red::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 4px;
+      height: 5px;
+      background: var(--color-primary);
+    }
+    .hero-sub {
+      max-width: 440px;
+      font-size: 0.95rem;
+      color: rgba(0,0,0,0.55);
+      margin-top: 1.5rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.65;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .hero-floater {
+      position: absolute;
+      top: 3rem;
+      right: 4rem;
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      animation: rotateFloat 12s linear infinite;
+    }
+    .hero-floater span {
+      font-size: 0.55rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      line-height: 1.6;
+    }
+    @keyframes rotateFloat {
+      0%   { transform: rotate(0deg) translateY(0); }
+      25%  { transform: rotate(90deg) translateY(-6px); }
+      50%  { transform: rotate(180deg) translateY(0); }
+      75%  { transform: rotate(270deg) translateY(-6px); }
+      100% { transform: rotate(360deg) translateY(0); }
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      background: var(--color-black);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 3px solid var(--color-yellow);
+    }
+    .stat-item {
+      padding: 2.5rem 3rem;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-number {
+      font-family: var(--font-mono-display);
+      font-size: 3.2rem;
+      color: var(--color-white);
+      line-height: 1;
+      display: block;
+    }
+    .stat-number.yellow { color: var(--color-yellow); }
+    .stat-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-top: 0.5rem;
+      display: block;
+    }
+
+    /* Approach Section */
+    .approach {
+      padding: 6rem 4rem;
+    }
+    .section-heading {
+      font-family: var(--font-mono-display);
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 3rem;
+    }
+    .approach-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .approach-card {
+      padding: 2.5rem;
+      border: 2px solid rgba(0,0,0,0.1);
+    }
+    .approach-card--old {
+      background: white;
+    }
+    .approach-card--new {
+      background: var(--color-black);
+      color: white;
+      border-color: transparent;
+    }
+    .approach-card-tag {
+      font-size: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding: 4px 10px;
+      display: inline-block;
+    }
+    .tag-old { background: var(--color-primary); color: white; }
+    .tag-new { background: var(--color-yellow); color: var(--color-black); }
+    .approach-card h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+    }
+    .approach-list { list-style: none; }
+    .approach-list li {
+      font-size: 0.88rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: rgba(0,0,0,0.6);
+    }
+    .approach-card--new .approach-list li { border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+    .approach-list li::before {
+      content: '×';
+      color: var(--color-primary);
+      font-weight: 900;
+      font-size: 1rem;
+    }
+    .approach-card--new .approach-list li::before {
+      content: '✓';
+      color: var(--color-yellow);
+    }
+    .approach-card-result {
+      margin-top: 1.2rem;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .result-bad { color: var(--color-primary); }
+    .result-good { color: var(--color-yellow); }
+
+    /* Signals */
+    .signals {
+      background: var(--color-black);
+      padding: 6rem 4rem;
+    }
+    .signals-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+    .signals-header h2 { color: white; }
+    .signal-row {
+      display: grid;
+      grid-template-columns: 3rem 1fr auto auto;
+      align-items: center;
+      gap: 1.5rem 2rem;
+      padding: 1.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: var(--transition);
+      cursor: default;
+    }
+    .signal-row:hover { background: rgba(255,255,255,0.03); padding-left: 1rem; }
+    .signal-num {
+      font-family: var(--font-mono-display);
+      font-size: 2rem;
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+    }
+    .signal-name {
+      font-family: var(--font-mono-display);
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      color: white;
+      letter-spacing: 0.04em;
+    }
+    .signal-freq {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .signal-badge {
+      font-size: 0.58rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--color-primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+
+    /* Industries */
+    .industries {
+      padding: 6rem 4rem;
+      background: var(--color-cream);
+    }
+    .industries-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .industry-card {
+      padding: 2.5rem;
+      border: 2px solid rgba(0,0,0,0.1);
+      background: white;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .industry-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--color-primary);
+      transform: scaleY(0);
+      transition: transform 0.25s ease;
+      transform-origin: bottom;
+    }
+    .industry-card:hover::before { transform: scaleY(1); }
+    .industry-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+    .industry-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .industry-card h3 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .industry-card p {
+      font-size: 0.85rem;
+      color: rgba(0,0,0,0.55);
+      line-height: 1.6;
+    }
+
+    /* CTA */
+    .cta-section {
+      background: var(--color-black);
+      padding: 6rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 3rem;
+    }
+    .cta-heading {
+      font-family: var(--font-mono-display);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      text-transform: uppercase;
+      line-height: 0.95;
+      color: white;
+    }
+    .cta-heading span { color: var(--color-primary); }
+    .cta-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 1.2rem;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+    .cta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; }
+    .cta-note {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* Ticker inside signals */
+    .signals-ticker {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--color-yellow);
+      color: var(--color-black);
+      padding: 4px 10px;
+      border-radius: 2px;
+      margin-left: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 4rem 1.5rem; }
+      .hero-floater { display: none; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .approach-grid, .industries-grid { grid-template-columns: 1fr; }
+      .cta-section { grid-template-columns: 1fr; }
+      .cta-right { align-items: flex-start; }
+      .signal-row { grid-template-columns: 2rem 1fr; }
+      .signal-freq, .signal-badge { display: none; }
+      .approach { padding: 4rem 1.5rem; }
+      .signals { padding: 4rem 1.5rem; }
+      .industries { padding: 4rem 1.5rem; }
+      .cta-section { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======== NAV ======== -->
+<nav class="nav nav--light">
+  <div class="nav-logo">
+    <svg class="nav-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"/>
+    </svg>
+    <span class="nav-logo-text">VocalPulse</span>
+    <span class="nav-logo-badge">Beta</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#signals">Signals</a></li>
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#industries">Pricing</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="login.html" class="btn btn-outline" style="color: var(--color-black); border-color: rgba(0,0,0,0.25);">Login</a>
+    <a href="login.html" class="btn btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- ======== HERO ======== -->
+<section class="hero" id="home">
+  <p class="hero-eyebrow">// Biometric Voice Authentication System</p>
+  <div class="hero-floater">
+    <span>STOP<br/>FAKE<br/>VOICE<br/>NOW</span>
+  </div>
+  <h1 class="hero-heading fade-up">
+    BIOLOGY<br/>CANNOT BE<br/><span class="underline-red">FORGED.</span>
+  </h1>
+  <p class="hero-sub fade-up">
+    Advanced biological markers that detect human vocal tract resonance. If it didn't come from a lung, we don't let it in.
+  </p>
+  <div class="hero-cta fade-up">
+    <a href="analysis.html" class="btn btn-dark" style="font-size: 0.85rem; padding: 14px 28px;">Run Free Analysis</a>
+    <a href="#signals" class="btn btn-outline" style="font-size: 0.85rem; padding: 14px 28px;">See How It Works →</a>
+  </div>
+</section>
+
+<!-- ======== MARQUEE ======== -->
+<div class="marquee-wrapper">
+  <div class="marquee-track">
+    <span>No More Deepfakes</span><span class="dot">●</span>
+    <span>Biological Verification</span><span class="dot">●</span>
+    <span>Zero-Latency Security</span><span class="dot">●</span>
+    <span>Human Or Synthetic</span><span class="dot">●</span>
+    <span>5 Biometric Signals</span><span class="dot">●</span>
+    <span>Edge Deployable</span><span class="dot">●</span>
+    <span>Under 100ms Verdict</span><span class="dot">●</span>
+    <!-- Duplicate for seamless loop -->
+    <span>No More Deepfakes</span><span class="dot">●</span>
+    <span>Biological Verification</span><span class="dot">●</span>
+    <span>Zero-Latency Security</span><span class="dot">●</span>
+    <span>Human Or Synthetic</span><span class="dot">●</span>
+    <span>5 Biometric Signals</span><span class="dot">●</span>
+    <span>Edge Deployable</span><span class="dot">●</span>
+    <span>Under 100ms Verdict</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ======== STATS BAR ======== -->
+<section class="stats-bar">
+  <div class="stat-item fade-up">
+    <span class="stat-number">$2.8B</span>
+    <span class="stat-label">Fraud Protected</span>
+  </div>
+  <div class="stat-item fade-up">
+    <span class="stat-number yellow">&lt;100MS</span>
+    <span class="stat-label">Verification Latency</span>
+  </div>
+  <div class="stat-item fade-up">
+    <span class="stat-number">5</span>
+    <span class="stat-label">Biometric Signals</span>
+  </div>
+</section>
+
+<!-- ======== APPROACH ======== -->
+<section class="approach" id="demo">
+  <h2 class="section-heading fade-up">WE CHANGED THE<br/>QUESTION.</h2>
+  <div class="approach-grid">
+    <div class="approach-card approach-card--old fade-up">
+      <span class="approach-card-tag tag-old">The Old Approach</span>
+      <h3>Does this sound like a human?</h3>
+      <ul class="approach-list">
+        <li>Audio frequency matching (heuristic)</li>
+        <li>Voiceprint comparison (flawed)</li>
+        <li>Background noise removal (obvious)</li>
+      </ul>
+      <p class="approach-card-result result-bad">RESULT: VULNERABLE TO GENERATIVE AI</p>
+    </div>
+    <div class="approach-card approach-card--new fade-up">
+      <span class="approach-card-tag tag-new">The VocalPulse Approach</span>
+      <h3 style="color: white;">Did a human body produce this?</h3>
+      <ul class="approach-list">
+        <li>Vocal tract resonance analysis</li>
+        <li>Lung pressure fluctuation metrics</li>
+        <li>Biological micro-jitter detection</li>
+      </ul>
+      <p class="approach-card-result result-good">RESULT: 100% SYNTHETIC-PROOF</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== THE 5 SIGNALS ======== -->
+<section class="signals" id="signals">
+  <div class="signals-header">
+    <h2 class="section-heading">THE 5 SIGNALS</h2>
+    <span class="signals-ticker">Physics Only</span>
+  </div>
+
+  <div class="signal-row fade-up">
+    <span class="signal-num">01</span>
+    <span class="signal-name">Laryngeal Resonance</span>
+    <span class="signal-freq">FREQ: 220Hz – 4.5kHz</span>
+    <span class="signal-badge">Undetectable by AI</span>
+  </div>
+  <div class="signal-row fade-up">
+    <span class="signal-num">02</span>
+    <span class="signal-name">Vocal Fold Jitter</span>
+    <span class="signal-freq">FREQ: 50Hz – 300Hz</span>
+    <span class="signal-badge">Undetectable by AI</span>
+  </div>
+  <div class="signal-row fade-up">
+    <span class="signal-num">03</span>
+    <span class="signal-name">Subglottal Pressure</span>
+    <span class="signal-freq">FREQ: N/A (Fluid Dynamics)</span>
+    <span class="signal-badge">Undetectable by AI</span>
+  </div>
+  <div class="signal-row fade-up">
+    <span class="signal-num">04</span>
+    <span class="signal-name">Nasal Coupling</span>
+    <span class="signal-freq">FREQ: 2.5kHz – 8kHz</span>
+    <span class="signal-badge">Undetectable by AI</span>
+  </div>
+  <div class="signal-row fade-up">
+    <span class="signal-num">05</span>
+    <span class="signal-name">Pharyngeal Shape</span>
+    <span class="signal-freq">FREQ: 3kHz – 11kHz</span>
+    <span class="signal-badge">Undetectable by AI</span>
+  </div>
+</section>
+
+<!-- ======== INDUSTRIES ======== -->
+<section class="industries" id="industries">
+  <h2 class="section-heading fade-up">INDUSTRIES SECURED</h2>
+  <div class="industries-grid">
+    <div class="industry-card fade-up">
+      <div class="industry-icon">🏦</div>
+      <h3>Banking &amp; Finance</h3>
+      <p>Zero-trust phone-based wire transfer authorization using biological voice verification.</p>
+    </div>
+    <div class="industry-card fade-up">
+      <div class="industry-icon">🏢</div>
+      <h3>Enterprise SaaS</h3>
+      <p>Secure executive communications and high-privilege access for remote distributed teams.</p>
+    </div>
+    <div class="industry-card fade-up">
+      <div class="industry-icon">🛡️</div>
+      <h3>Government</h3>
+      <p>Military-grade voice authentication for sensitive communications and field operations.</p>
+    </div>
+    <div class="industry-card fade-up">
+      <div class="industry-icon">🏥</div>
+      <h3>Healthcare</h3>
+      <p>Patient identity verification for telehealth and digital prescription management.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== CTA ======== -->
+<section class="cta-section">
+  <div>
+    <h2 class="cta-heading">IS YOUR VOICE<br/><span>REAL?</span></h2>
+    <p class="cta-sub">Stop fighting AI with algorithms. Start fighting with biology. Integrate the pulse in under 5 minutes.</p>
+  </div>
+  <div class="cta-right">
+    <a href="analysis.html" class="btn btn-yellow" style="font-size: 0.9rem; padding: 18px 36px;">Start Free Trial</a>
+    <span class="cta-note">No credit card required</span>
+  </div>
+</section>
+
+<!-- ======== FOOTER ======== -->
+<footer class="footer">
+  <div class="nav-logo" style="color: rgba(255,255,255,0.8);">
+    <svg class="nav-logo-icon" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"/>
+    </svg>
+    <span class="nav-logo-text" style="color:white;">VocalPulse</span>
+    <span class="nav-logo-badge">Beta</span>
+  </div>
+  <div class="footer-links">
+    <a href="#">Documentation</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">API Status</a>
+  </div>
+  <span class="footer-copy">© 2026 VocalPulse Biometrics Ltd. All rights reserved.</span>
+</footer>
+
+<script>
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
